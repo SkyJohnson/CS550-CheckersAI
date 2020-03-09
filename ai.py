@@ -27,16 +27,13 @@ class Strategy:
     def utility:
     blah
     squee
-
-
-
-
-
-
-
-
 '''
-class Strategy():
+
+
+############## UNTESTED ###############
+
+
+class Strategy(abstractstrategy.Strategy):
 
     '''utility.Takes
        a CheckerBoard and determines
@@ -46,7 +43,16 @@ class Strategy():
 
 
     def utility(self, board, player):
-        return 0
+        # Very basic utility function for testing purposes
+        minPlayer = board.other_player(player)
+
+        countPlayerPawns = board.get_pawnsN()[board.playeridx(player)]
+        countPlayerKings = board.get_kingsN()[board.playeridx(player)]
+        countOtherPawns = board.get_pawnsN()[board.playeridx(minPlayer)]
+        countOtherKings = board.get_kingsN()[board.playeridx(minPlayer)]
+
+        return (countPlayerPawns - countOtherPawns) + (countPlayerKings - countOtherKings)
+
 
     '''
     play. Takes a checkerboard and determines the best move with respect to alpha-beta search for the player 
@@ -55,7 +61,10 @@ class Strategy():
 
     def play(self, board):
         #Need to implement the alpha-beta search to finish this method
-        return 0
+        search = MinimaxAphaBetaSearch(self.maxPlayer, self.minPlayer, self.maxPlies)
+        # Search will return utility of best move
+        # need to call board.move() and pass in the action with utility given from search
+        return search
 
 class MinimaxAphaBetaSearch:
 # In this class, the alpha-beta pruning action shall take place with the functions
@@ -63,28 +72,40 @@ class MinimaxAphaBetaSearch:
 
     # Initialize a search
     def __init__(self, maxPlayer, minPlayer, maxPlies):
-
-
-
-
-
         self.maxPlayer = maxPlayer # Will be storing which player is the max or min searching one
         self.minPlayer = minPlayer
         self.maxPlies = maxPlies
 
     # state being a board state representation
     def alphaBetaSearch(self,state):
-        return self.maxValue(state, -1*math.inf, math.inf, 0)
+        depth = 0
+        return self.maxValue(state, -1*math.inf, math.inf, self.maxPlies, depth)
+
+    def minValue(self, state, alpha, beta, maxplies, depth):
+        if state.is_terminal() or depth >= maxplies:    # board is at a terminal state or we have reach max search depth
+            v = Strategy.utility(state, self.maxPlayer)
+        else:
+            depth += 1
+            v = math.inf
+            for action in state.get_actions(self.maxPlayer):
+                v = min((v, maxValue(state.move(action), alpha, beta, maxplies, depth)))
+                if v <= alpha:
+                    break
+                else:
+                   beta = min((beta, v))
+        return v
 
 
-
-    def minValue(self, state, alpha, beta, depth):
-        return 0
-
-
-    def maxValue(self, state, alpha, beta, depth):
-
-
-
-
-        return 0
+    def maxValue(self, state, alpha, beta, maxplies, depth): 
+        if state.is_terminal() or depth >= maxplies:    # board is at a terminal state or we have reach max search depth
+            v = Strategy.utility(state, self.maxPlayer)
+        else:
+            depth += 1
+            v = -1*math.inf
+            for action in state.get_actions(self.maxPlayer):
+                v = max((v, minValue(state.move(action), alpha, beta, maxplies, depth)))
+                if v >= beta:
+                    break
+                else:
+                   alpha = max((alpha, v))
+        return v
