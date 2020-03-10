@@ -32,10 +32,12 @@ import human
 import boardlibrary # might be useful for debugging
 
 from timer import Timer
+
+import ai
         
 
-def Game(red=human.Strategy, black=tonto.Strategy, 
-         maxplies=10, init=None, verbose=True, firstmove=1):
+def Game(red=ai.Strategy, black=human.Strategy, 
+         maxplies=10, init=None, verbose=True, firstmove=0):
     """Game(red, black, maxplies, init, verbose, turn)
     Start a game of checkers
     red,black - Strategy classes (not instances)
@@ -56,12 +58,18 @@ def Game(red=human.Strategy, black=tonto.Strategy,
     while not board.is_terminal()[0]:
         state = red.play(board)
         board = state[0]
-        if state[1] is None:
+        action = state[1]
+        print(board)
+        if action is None:
             break
         if not board.is_terminal()[0]:
-            board = black.play(board)[0]
+            state = black.play(board)
+            board = state[0]
+            action = state[1]
         print(board)
-    
+
+    #print(red.play(board))
+
             
 if __name__ == "__main__":
     #Game(init=boardlibrary.boards["multihop"])

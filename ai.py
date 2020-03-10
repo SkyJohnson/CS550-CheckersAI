@@ -65,8 +65,8 @@ class Strategy(abstractstrategy.Strategy):
         # Search will return utility of best move
         # need to call board.move() and pass in the action with utility given from search
         best_move = search.alphaBetaSearch(board)
-        return best_move
-        #return (board.move(best_move), best_move)
+        #return best_move
+        return (board.move(best_move), best_move)
 
 class MinimaxAlphaBetaSearch:
 # In this class, the alpha-beta pruning action shall take place with the functions
@@ -77,16 +77,22 @@ class MinimaxAlphaBetaSearch:
         self.maxPlayer = maxPlayer # Will be storing which player is the max or min searching one
         self.minPlayer = minPlayer
         self.maxPlies = maxPlies
-        self.best_action = []
+        self.action_utils = dict()
 
     # state being a board state representation
     def alphaBetaSearch(self,state):
         depth = 0
+        best_action = []
         max_util = self.maxValue(state, -1*math.inf, math.inf, self.maxPlies, depth)
-        return self.best_action
+        for key,value in self.action_utils.items():
+            if value == max_util:
+                best_action = key
+
+            #print(key, value)
+
+        return best_action
 
     def maxValue(self, state, alpha, beta, maxplies, depth): 
-        currV = 0
         if state.is_terminal()[0] or depth >= maxplies:    # board is at a terminal state or we have reach max search depth
             v = Strategy.utility(Strategy, state, self.maxPlayer)
         else:
@@ -94,9 +100,8 @@ class MinimaxAlphaBetaSearch:
             v = -1*math.inf
             for action in state.get_actions(self.maxPlayer):
                 v = max((v, self.minValue(state.move(action), alpha, beta, maxplies, depth)))
-                if v > currV:
-                    currV = v
-                    self.best_action = action
+                if depth == 1:
+                    self.action_utils[tuple(action)] = v
                 if v >= beta:
                     break
                 else:
