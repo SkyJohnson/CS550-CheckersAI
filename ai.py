@@ -64,7 +64,9 @@ class Strategy(abstractstrategy.Strategy):
         search = MinimaxAlphaBetaSearch(self.maxplayer, self.minplayer, self.maxplies)
         # Search will return utility of best move
         # need to call board.move() and pass in the action with utility given from search
-        return search.alphaBetaSearch(board)
+        best_move = search.alphaBetaSearch(board)
+        return best_move
+        #return (board.move(best_move), best_move)
 
 class MinimaxAlphaBetaSearch:
 # In this class, the alpha-beta pruning action shall take place with the functions
@@ -75,25 +77,31 @@ class MinimaxAlphaBetaSearch:
         self.maxPlayer = maxPlayer # Will be storing which player is the max or min searching one
         self.minPlayer = minPlayer
         self.maxPlies = maxPlies
+        self.best_action = []
 
     # state being a board state representation
     def alphaBetaSearch(self,state):
         depth = 0
-        return self.maxValue(state, -1*math.inf, math.inf, self.maxPlies, depth)
+        max_util = self.maxValue(state, -1*math.inf, math.inf, self.maxPlies, depth)
+        return self.best_action
 
     def maxValue(self, state, alpha, beta, maxplies, depth): 
-            if state.is_terminal()[0] or depth >= maxplies:    # board is at a terminal state or we have reach max search depth
-                v = Strategy.utility(Strategy, state, self.maxPlayer)
-            else:
-                depth += 1
-                v = -1*math.inf
-                for action in state.get_actions(self.maxPlayer):
-                    v = max((v, self.minValue(state.move(action), alpha, beta, maxplies, depth)))
-                    if v >= beta:
-                        break
-                    else:
-                        alpha = max((alpha, v))
-            return v
+        currV = 0
+        if state.is_terminal()[0] or depth >= maxplies:    # board is at a terminal state or we have reach max search depth
+            v = Strategy.utility(Strategy, state, self.maxPlayer)
+        else:
+            depth += 1
+            v = -1*math.inf
+            for action in state.get_actions(self.maxPlayer):
+                v = max((v, self.minValue(state.move(action), alpha, beta, maxplies, depth)))
+                if v > currV:
+                    currV = v
+                    self.best_action = action
+                if v >= beta:
+                    break
+                else:
+                    alpha = max((alpha, v))
+        return v
     def minValue(self, state, alpha, beta, maxplies, depth):
         if state.is_terminal()[0] or depth >= maxplies:    # board is at a terminal state or we have reach max search depth
             v = Strategy.utility(Strategy, state, self.minPlayer)
