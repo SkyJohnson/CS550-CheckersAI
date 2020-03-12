@@ -2,6 +2,7 @@ import math
 import abstractstrategy
 # Might need to import from the checkerboard class to access checkerboard functionality and implement
 from checkerboard import * #Importing all the file has to offer
+import random
 
 '''
 Need a class that does minimax with alpha and beta pruning. Something along the lines of:
@@ -57,37 +58,40 @@ class Strategy(abstractstrategy.Strategy):
         opponent_piece_position = 0
 
 
-        for info in board:
-            (player_id, king_piece) = board.identifypiece(info[2])
+        ### Following code gets stuck in an infinite loop ###
+        ###         Commenting out until debugged         ###
 
-            # board is a tuple of three elements: (row, column, player)
-            # Where: info[0] = row value, info[1] = column value, info[2] = player = 'r' or 'b'
+        # for info in board:
+        #     (player_id, king_piece) = board.identifypiece(info[2])
 
-            if player_id == board.playeridx(player): # Piece belongs to player
-                player_pieces += 1
-                print("Found player piece!") #Testing purposes
+        #     # board is a tuple of three elements: (row, column, player)
+        #     # Where: info[0] = row value, info[1] = column value, info[2] = player = 'r' or 'b'
 
-                if king_piece: # Here, check if it's also a king piece
-                    player_king_pieces += 1
-                    print("Found player king piece!")
+        #     if player_id == board.playeridx(player): # Piece belongs to player
+        #         player_pieces += 1
+        #         print("Found player piece!") #Testing purposes
 
-            else:
-                opponent_pieces += 1
-                print("Found opponent piece!")
+        #         if king_piece: # Here, check if it's also a king piece
+        #             player_king_pieces += 1
+        #             print("Found player king piece!")
 
-                if king_piece:
-                    opponent_king_pieces += 1
-                    print("Found opponent king piece!")
+        #     else:
+        #         opponent_pieces += 1
+        #         print("Found opponent piece!")
+
+        #         if king_piece:
+        #             opponent_king_pieces += 1
+        #             print("Found opponent king piece!")
 
         countPlayerPawns = board.get_pawnsN()[board.playeridx(player)]
         countPlayerKings = board.get_kingsN()[board.playeridx(player)]
         countOtherPawns = board.get_pawnsN()[board.playeridx(self.min_player)]
         countOtherKings = board.get_kingsN()[board.playeridx(self.min_player)]
 
-        print(countPlayerPawns)
-        print(countPlayerKings)
-        print(countOtherPawns)
-        print(countOtherKings)
+        # print(countPlayerPawns)
+        # print(countPlayerKings)
+        # print(countOtherPawns)
+        # print(countOtherKings)
 
 
         return (countPlayerPawns - countOtherPawns) + (countPlayerKings - countOtherKings)
@@ -122,38 +126,52 @@ class MinimaxAlphaBetaSearch:
     def alphaBetaSearch(self,state):
         depth = 0
         best_action = [] # store the best action found for the max player
-        max_util = self.maxValue(state, -1*math.inf, math.inf, self.max_plies, depth)
+        max_util = self.maxValue(state, -1*math.inf, math.inf, self.max_plies, depth)   # Max utility for given player
+
+        # List all possible actions with max utility
+        possible_best_actions = []
         for key,value in self.action_utils.items():
+            
             if value == max_util:
-                best_action = key
+                possible_best_actions.append(key)
 
             #print(key, value)
+
+        # If multiple actions have the same max utility select one at random
+        best_action = random.choice(possible_best_actions)
 
         return best_action
 
     def maxValue(self, state, alpha, beta, max_plies, depth):
-        if state.is_terminal()[0] or depth >= max_plies:    # board is at a terminal state or we have reach max search depth
+        # board is at a terminal state or we have reached max search depth -> return utility
+        if state.is_terminal()[0] or depth >= max_plies:
             v = Strategy.utility(Strategy, state, self.max_player)
+        # Continue down the search tree
         else:
             depth += 1
             v = -1*math.inf
             for action in state.get_actions(self.max_player):
                 v = max((v, self.minValue(state.move(action), alpha, beta, max_plies, depth)))
+                # At the top of the search tree add possible moves and their associated utility to a dictionary
                 if depth == 1:
                     self.action_utils[tuple(action)] = v
+                # Utility falls outside of range -> No need to continue searching
                 if v >= beta:
                     break
                 else:
                     alpha = max((alpha, v))
         return v
     def minValue(self, state, alpha, beta, max_plies, depth):
-        if state.is_terminal()[0] or depth >= max_plies:    # board is at a terminal state or we have reach max search depth
+        # board is at a terminal state or we have reach max search depth -> return utility
+        if state.is_terminal()[0] or depth >= max_plies:
             v = Strategy.utility(Strategy, state, self.min_player)
+        # Continue down search tree
         else:
             depth += 1
             v = math.inf
             for action in state.get_actions(self.min_player):
                 v = min((v, self.maxValue(state.move(action), alpha, beta, max_plies, depth)))
+                # Utility falls outside of range -> No need to continue searching
                 if v <= alpha:
                     break
                 else:
