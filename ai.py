@@ -27,9 +27,6 @@ class Strategy:
 '''
 
 
-############## UNTESTED ###############
-
-
 class Strategy(abstractstrategy.Strategy):
 
     '''utility.Takes
@@ -48,41 +45,39 @@ class Strategy(abstractstrategy.Strategy):
         #Still deciding on how to value the different weights for the different terms.
 
         #Set up the utility variables for each player, might need one more to evaluate the position for distoking
-        player_pieces = 0
-        player_king_pieces = 0
         player_piece_position = 0 # Will be used for the score evaluation of where the piece is at currently and
                                     # maybe to how far away the king row is to a piece. Still planning it out.
-
-        opponent_pieces = 0
-        opponent_king_pieces = 0
         opponent_piece_position = 0
 
+        player_sum_dist_to_king = 0
+        other_sum_dist_to_king = 0
 
-        ### Following code gets stuck in an infinite loop ###
-        ###         Commenting out until debugged         ###
+        # Forming bridges makes pieces immune to being captured 
+        player_num_bridges = 0
+        other_num_bridges = 0
 
-        # for info in board:
-        #     (player_id, king_piece) = board.identifypiece(info[2])
 
-        #     # board is a tuple of three elements: (row, column, player)
-        #     # Where: info[0] = row value, info[1] = column value, info[2] = player = 'r' or 'b'
+        for info in board:
+            (player_id, king_piece) = board.identifypiece(info[2])
 
-        #     if player_id == board.playeridx(player): # Piece belongs to player
-        #         player_pieces += 1
-        #         print("Found player piece!") #Testing purposes
+            # board is a tuple of three elements: (row, column, player)
+            # Where: info[0] = row value, info[1] = column value, info[2] = player = 'r' or 'b'
 
-        #         if king_piece: # Here, check if it's also a king piece
-        #             player_king_pieces += 1
-        #             print("Found player king piece!")
+            if player_id == board.playeridx(player): # Piece belongs to player
 
-        #     else:
-        #         opponent_pieces += 1
-        #         print("Found opponent piece!")
+                ### TODO: Check for bridges (e.q. mutiple pieces of same player stacked diagonally) ###
+                # Check board locations surrounding given piece
+                # If piece at that location matches player -> player_num_bridges += 1
+                # Can also keep track of size of bridges
 
-        #         if king_piece:
-        #             opponent_king_pieces += 1
-        #             print("Found opponent king piece!")
+                if not king_piece: # Here, check if it's also a king piece
+                    player_sum_dist_to_king += board.disttoking(player, info[0])    # How many moves for player to get a king
 
+            else:
+                if not king_piece:
+                    other_sum_dist_to_king += board.disttoking(self.min_player, info[0])    # How many moves for opponent to get a king
+
+        # Count player and opponent pieces on board (kings weighted higher)
         countPlayerPawns = board.get_pawnsN()[board.playeridx(player)]
         countPlayerKings = board.get_kingsN()[board.playeridx(player)]
         countOtherPawns = board.get_pawnsN()[board.playeridx(self.min_player)]
@@ -94,7 +89,7 @@ class Strategy(abstractstrategy.Strategy):
         # print(countOtherKings)
 
 
-        return (countPlayerPawns - countOtherPawns) + (countPlayerKings - countOtherKings)
+        return (countPlayerPawns - countOtherPawns) + (2*(countPlayerKings - countOtherKings)) + (5*(other_sum_dist_to_king - player_sum_dist_to_king))
 
 
     '''

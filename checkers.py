@@ -36,8 +36,8 @@ from timer import Timer
 import ai
         
 
-def Game(red=ai.Strategy, black=human.Strategy, 
-         maxplies=10, init=None, verbose=True, firstmove=0):
+def Game(red=ai.Strategy, black=tonto.Strategy, 
+         maxplies=3, init=None, verbose=True, firstmove=0):
     """Game(red, black, maxplies, init, verbose, turn)
     Start a game of checkers
     red,black - Strategy classes (not instances)
