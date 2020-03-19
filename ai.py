@@ -103,6 +103,9 @@ class Strategy(abstractstrategy.Strategy):
         # Search will return utility of best move
         # need to call board.move() and pass in the action with utility given from search
         best_move = search.alphaBetaSearch(board)
+        
+        if best_move is None:
+            return (board, None)
         #return best_move
         return (board.move(best_move), best_move)
 
@@ -120,21 +123,21 @@ class MinimaxAlphaBetaSearch:
     # state being a board state representation
     def alphaBetaSearch(self,state):
         depth = 0
-        best_action = [] # store the best action found for the max player
+        best_action = None # store the best action found for the max player
         max_util = self.maxValue(state, -1*math.inf, math.inf, self.max_plies, depth)   # Max utility for given player
 
-        # List all possible actions with max utility
         possible_best_actions = []
+        # List all possible actions with max utility
         for key,value in self.action_utils.items():
             
             if value == max_util:
                 possible_best_actions.append(key)
-
             #print(key, value)
 
-        # If multiple actions have the same max utility select one at random
-        best_action = random.choice(possible_best_actions)
+            if len(possible_best_actions) > 0:
+                best_action = random.choice(possible_best_actions)
 
+        print (best_action)
         return best_action
 
     def maxValue(self, state, alpha, beta, max_plies, depth):

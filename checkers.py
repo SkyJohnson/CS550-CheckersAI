@@ -37,7 +37,7 @@ import ai
         
 
 def Game(red=ai.Strategy, black=tonto.Strategy, 
-         maxplies=3, init=None, verbose=True, firstmove=0):
+         maxplies=5, init=None, verbose=True, firstmove=0):
     """Game(red, black, maxplies, init, verbose, turn)
     Start a game of checkers
     red,black - Strategy classes (not instances)
@@ -73,7 +73,7 @@ def Game(red=ai.Strategy, black=tonto.Strategy,
         state = red.play(board) # Get tuple of new board following an action and the action itself
         board = state[0]
         action = state[1]
-        if verbose:
+        if verbose and action is not None:
             print('Red Move: ', board.get_action_str(action))
         print(board)
 
@@ -86,7 +86,7 @@ def Game(red=ai.Strategy, black=tonto.Strategy,
             state = black.play(board)   # Get tuple of new board following an action and the action itself
             board = state[0]
             action = state[1]
-            if verbose:
+            if verbose and action is not None:
                 print('Black Move: ', board.get_action_str(action))
         print(board)
 
