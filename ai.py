@@ -91,7 +91,7 @@ class Strategy(abstractstrategy.Strategy):
                     if board.get(row + 1, column + 1) == player:
                         other_num_bridges += 1
                     '''
-                    player_num_bridges = self.getBridges(self, board, self.min_player, row, column)
+                    player_num_bridges =+ self.getBridges(self, board, self.min_player, row, column)
 
                     print(self.min_player,"player Piece at ", row, column, "Has bridges:", player_num_bridges)
                     other_sum_dist_to_king += board.disttoking(self.min_player,
@@ -109,7 +109,7 @@ class Strategy(abstractstrategy.Strategy):
         # print(countOtherKings)
         print(board)
 
-        return 5 * (countPlayerPawns - countOtherPawns) + (2 * (countPlayerKings - countOtherKings)) + (
+        return 2 * (countPlayerPawns - countOtherPawns) + (4 * (countPlayerKings - countOtherKings)) + (
                 9 * (other_sum_dist_to_king - player_sum_dist_to_king))
 
     '''
@@ -139,8 +139,17 @@ class Strategy(abstractstrategy.Strategy):
                 if board.get(down, right) == player:
                     bridges_found += 1
 
-        if column == 0 and 0 < row < 7: # Edge case of the piece at the leftmost column
+        if row == 7:  # Edge case of a piece being at the bottom row
+            if column == 0:
+                if board.get(up, right) == player:
+                    bridges_found += 1
+            else:
+                if board.get(up, left):
+                    bridges_found += 1
+                if board.get(up, right):
+                    bridges_found += 1
 
+        if column == 0 and 0 < row < 7: # Edge case of the piece at the leftmost column
             # Should only check the rightmost squares
             if board.get(up, right) == player:
                 bridges_found += 1
@@ -153,15 +162,7 @@ class Strategy(abstractstrategy.Strategy):
             if board.get(down, left) == player:
                 bridges_found += 1
 
-        if row == 7: # Edge case of a piece being at the bottom row
-            if column == 0:
-                if board.get(up, right) == player:
-                    bridges_found += 1
-                else:
-                    if board.get(up, left):
-                        bridges_found += 1
-                    if board.get(up, right):
-                        bridges_found += 1
+
 
         if (0 < row < 7) and (0 < column < 7):
             if board.get(up, left) == player:
