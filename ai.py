@@ -70,13 +70,12 @@ class Strategy(abstractstrategy.Strategy):
                 if not king_piece:  # Here, check if it's also a king piece
 
                     # getBridges function needs work, fails on edge cases
-                    player_num_bridges = self.getBridges(self, board, player, row, column)
+                    # player_num_bridges = self.getBridges(self, board, player, row, column)
 
-                    print("Piece at ", row, column, "Has bridges:", player_num_bridges)
+                    # print("Piece at ", row, column, "Has bridges:", player_num_bridges)
 
                     player_sum_dist_to_king += board.disttoking(player,
                                                                 row)  # How many moves for player to get a king
-
             else:  # Red player
                 if not king_piece:
                     '''
@@ -92,6 +91,9 @@ class Strategy(abstractstrategy.Strategy):
                     if board.get(row + 1, column + 1) == player:
                         other_num_bridges += 1
                     '''
+                    player_num_bridges = self.getBridges(self, board, self.min_player, row, column)
+
+                    print("Piece at ", row, column, "Has bridges:", player_num_bridges)
                     other_sum_dist_to_king += board.disttoking(self.min_player,
                                                                row)  # How many moves for opponent to get a king
 
@@ -105,6 +107,7 @@ class Strategy(abstractstrategy.Strategy):
         # print(countPlayerKings)
         # print(countOtherPawns)
         # print(countOtherKings)
+        print(board)
 
         return 5 * (countPlayerPawns - countOtherPawns) + (2 * (countPlayerKings - countOtherKings)) + (
                 9 * (other_sum_dist_to_king - player_sum_dist_to_king))
@@ -117,7 +120,7 @@ class Strategy(abstractstrategy.Strategy):
     # Function that checks all around a piece for any other allied pieces to form a bridge with
 
     def getBridges(self, board, player, row, column):
-        
+
         bridges_found = 0
         left = column - 1
         right = column + 1
@@ -126,17 +129,52 @@ class Strategy(abstractstrategy.Strategy):
 
         # Need to check the edge cases of the pieces being at the edges of the board
 
-        if board.get(up, left) == player:
-            bridges_found += 1
+        if row == 0:  # These are the edge cases for the black pieces being at the top most row
+            if column == 7:  # Edge case of checking a piece if it's at the upper right corner
+                if board.get(down, left) == player:
+                    bridges_found += 1
+            else:
+                if board.get(down, left) == player:
+                    bridges_found += 1
+                if board.get(down, right) == player:
+                    bridges_found += 1
 
-        if board.get(up, right) == player:
-            bridges_found += 1
+        if column == 0 and 0 < row < 7: # Edge case of the piece at the leftmost column
 
-        if board.get(down, left) == player:
-            bridges_found += 1
+            # Should only check the rightmost squares
+            if board.get(up, right) == player:
+                bridges_found += 1
+            if board.get(down, right) == player:
+                bridges_found += 1
 
-        if board.get(down, right) == player:
-            bridges_found += 1
+        if column == 7 and 0 < row < 7: # Edge case of the piece at the right most column
+            if board.get(up, left) == player:
+                bridges_found += 1
+            if board.get(down, left) == player:
+                bridges_found += 1
+
+        if row == 7: # Edge case of a piece being at the bottom row
+            if column == 0:
+                if board.get(up, right) == player:
+                    bridges_found += 1
+                else:
+                    if board.get(up, left):
+                        bridges_found += 1
+                    if board.get(up, right):
+                        bridges_found += 1
+
+        if (0 < row < 7) and (0 < column < 7): # Check all 4 corncers of a piece
+            if board.get(up, left) == player:
+                bridges_found += 1
+
+            if board.get(up, right) == player:
+                bridges_found += 1
+
+            if board.get(down, left) == player:
+                bridges_found += 1
+
+            if board.get(down, right) == player:
+                bridges_found += 1
 
         return bridges_found
 
