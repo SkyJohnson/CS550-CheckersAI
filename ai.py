@@ -93,7 +93,7 @@ class Strategy(abstractstrategy.Strategy):
                     '''
                     player_num_bridges = self.getBridges(self, board, self.min_player, row, column)
 
-                    print("Piece at ", row, column, "Has bridges:", player_num_bridges)
+                    print(self.min_player,"player Piece at ", row, column, "Has bridges:", player_num_bridges)
                     other_sum_dist_to_king += board.disttoking(self.min_player,
                                                                row)  # How many moves for opponent to get a king
 
@@ -163,7 +163,7 @@ class Strategy(abstractstrategy.Strategy):
                     if board.get(up, right):
                         bridges_found += 1
 
-        if (0 < row < 7) and (0 < column < 7): # Check all 4 corncers of a piece
+        if (0 < row < 7) and (0 < column < 7):
             if board.get(up, left) == player:
                 bridges_found += 1
 
