@@ -224,7 +224,8 @@ class MinimaxAlphaBetaSearch:
         return best_action
 
     def maxValue(self, state, alpha, beta, max_plies, depth):
-        # board is at a terminal state or we have reached max search depth -> return utility
+                
+        # The board is at a terminal state or we have reached max search depth -> return utility
         if state.is_terminal()[0] or depth >= max_plies:
             v = Strategy.utility(Strategy, state, self.max_player)
         # Continue down the search tree
@@ -232,10 +233,30 @@ class MinimaxAlphaBetaSearch:
             depth += 1
             v = -1 * math.inf
             for action in state.get_actions(self.max_player):
-                v = max((v, self.minValue(state.move(action), alpha, beta, max_plies, depth)))
+                # Using a tuple as a key for the dictionary because lists are not hashable and cannot be used as keys in a dictionary.
+                # Storing the utility of each child node for the max player in a dictionary with the action as the key and the utility as the value.
+                # Storing it in a childs dictionary so that we can access it later when we are at the top of the search tree and need to return the best action for the max player.
+                # Otherwise, we would have to search through the entire tree again to find the best action for the max player, which would be inefficient.
+                # And we would have to store the entire tree in memory, which would be inefficient as well.
+                
+                # One caveat: alpha-beta can return bounds for pruned branches, so selecting among equal dictionary scores may treat an inferior move as tied. 
+                # For choosing a move, tracking best_action and updating it only when a child beats the current best is safer.
+                            
+                 # Recursively call minValue to get the utility of the child node
+                child_value = self.minValue(state.move(action), alpha, beta, max_plies, depth)
+                
+                # Both minValue and maxValue must use the same perspective, normally the AI’s. 
+                # So the minimizing player chooses the lowest score for the AI.
+                
+                
+                
+                
+                
+                # Update the utility of the max player with the utility of the child node
+                v = max(v, child_value)  # Store the utility of each child node for the max player
                 # At the top of the search tree add possible moves and their associated utility to a dictionary
                 if depth == 1:
-                    self.action_utils[tuple(action)] = v
+                    self.action_utils[tuple(action)] = child_value
                 # Utility falls outside of range -> No need to continue searching
                 if v >= beta:
                     break
@@ -244,15 +265,24 @@ class MinimaxAlphaBetaSearch:
         return v
 
     def minValue(self, state, alpha, beta, max_plies, depth):
-        # board is at a terminal state or we have reach max search depth -> return utility
-        if state.is_terminal()[0] or depth >= max_plies:
-            v = Strategy.utility(Strategy, state, self.min_player)
+        # The board is at a terminal state or we have reached max search depth -> return utility
+        if state.is_terminal()[0] or depth >= max_plies: 
+            # Originally had Strategy.utility(Strategy, state, self.min_player) but that was returning the wrong utility value for the min player
+        
+            # Use one score perspective” means evaluate every leaf for self.max_player, even when it’s the opponent’s turn. 
+            # Then maxValue maximizes that score and minValue minimizes it. 
+            # Before, minValue passed self.min_player to the evaluator, which flipped the perspective.
+            
+            # Both minValue and maxValue must use the same perspective, normally the AI’s. 
+            # So the minimizing player chooses the lowest score for the AI.
+            v = Strategy.utility(Strategy, state, self.max_player)
         # Continue down search tree
         else:
             depth += 1
             v = math.inf
             for action in state.get_actions(self.min_player):
-                v = min((v, self.maxValue(state.move(action), alpha, beta, max_plies, depth)))
+                child_value = self.maxValue(state.move(action), alpha, beta, max_plies, depth)
+                v = min((v, child_value))
                 # Utility falls outside of range -> No need to continue searching
                 if v <= alpha:
                     break
