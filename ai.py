@@ -36,6 +36,21 @@ class Strategy(abstractstrategy.Strategy):
 
     def utility(self, board, player):
         # Very basic utility function for testing purposes
+        
+        # A high score for the player is good, a low score is bad. 
+        # The score is calculated by counting the number of pieces for each player and returning the difference between the two counts. 
+        # The player with more pieces has a higher score.
+            
+        # If the a player wins, return a high score for the winner and a low score for the loser. 
+        # Dominating the heuristic with a win is more important than the number of pieces on the board.
+        
+        
+        terminal, winner = board.is_terminal()
+        if terminal:
+            if winner is None:
+                return 0
+            return 1000 if winner == player else -1000
+
         self.min_player = board.other_player(player)
 
         # Plan on using a linear weight model:
@@ -249,9 +264,6 @@ class MinimaxAlphaBetaSearch:
                 # So the minimizing player chooses the lowest score for the AI.
                 
                 
-                
-                
-                
                 # Update the utility of the max player with the utility of the child node
                 v = max(v, child_value)  # Store the utility of each child node for the max player
                 # At the top of the search tree add possible moves and their associated utility to a dictionary
@@ -274,7 +286,11 @@ class MinimaxAlphaBetaSearch:
             # Before, minValue passed self.min_player to the evaluator, which flipped the perspective.
             
             # Both minValue and maxValue must use the same perspective, normally the AI’s. 
-            # So the minimizing player chooses the lowest score for the AI.
+            # So the minimizing player chooses the lowest score for the AI. 
+            
+            # If the AI is red, every terminal / depth-limited evaluation should answer:
+            # “How good is this position for red?”
+            # Not: “How good is this position for whoever is to move?”
             v = Strategy.utility(Strategy, state, self.max_player)
         # Continue down search tree
         else:

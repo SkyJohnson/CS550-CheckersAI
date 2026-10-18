@@ -14,7 +14,7 @@ from checkerboard import CheckerBoard
 #
 # Decompilation is cheating, don't do it.  Big sister is watching you :-)
 
-# Python cand load compiled modules using the imp module (deprecated)
+# Python can't load compiled modules using the imp module (deprecated)
 # We'll format the path to the tonto module based on the
 # release of Python.  Note that we provided tonto compilations for Python 3.7
 # and 3.8.  If you're not using one of these, it won't work.
@@ -36,8 +36,8 @@ from timer import Timer
 import ai
         
 
-def Game(red=ai.Strategy, black=tonto.Strategy, 
-         maxplies=5, init=None, verbose=True, firstmove=0):
+def Game(red=ai.Strategy, black=human.Strategy, 
+         maxplies=2, init=None, verbose=True, firstmove=0):
     """Game(red, black, maxplies, init, verbose, turn)
     Start a game of checkers
     red,black - Strategy classes (not instances)
