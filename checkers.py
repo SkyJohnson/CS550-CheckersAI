@@ -18,12 +18,12 @@ from checkerboard import CheckerBoard
 # We'll format the path to the tonto module based on the
 # release of Python.  Note that we provided tonto compilations for Python 3.7
 # and 3.8.  If you're not using one of these, it won't work.
-import imp
+#import imp
 import sys
 major = sys.version_info[0]
 minor = sys.version_info[1]
 modpath = "__pycache__/tonto.cpython-{}{}.pyc".format(major, minor)
-tonto = imp.load_compiled("tonto", modpath)
+#tonto = imp.load_compiled("tonto", modpath)
 
 
 # human - human player, prompts for input    
